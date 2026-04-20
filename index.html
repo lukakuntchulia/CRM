@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Realtor AI CRM - Dark Mode</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ძებნა (ID, ტელეფონი, ლოკაცია...)">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>მესაკუთრე</th>
+                    <th>მესაკუთრის ტელ</th>
+                    <th>Link</th>
+                    <th>გარიგება</th>
+                    <th>ტიპი</th>
+                    <th>ლოკაცია & ფასი</th>
+                    <th>სოც. ქსელი</th>
+                    <th>პირობები</th>
+                    <th>კომენტარი</th>
+                    <th>Agency ID</th>
+                    <th>კლიენტის სახელი</th>
+                    <th>კლიენტის ტელ</th>
+                    <th>შედეგი (სტატუსი)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <button class="fab" onclick="openAIModal()">+</button>
+
+    <div class="modal-overlay" id="aiModal">
+        <div class="modal">
+            <h3>ახალი ობიექტის დამატება</h3>
+            <textarea id="aiInput" placeholder="მაგ: ქირავდება ბინა აბაშიძის N20, 60კვ, ფასი 1200$, ლუკა ტელ 555-555-555..."></textarea>
+            <div class="btn-group">
+                <button class="btn-cancel" onclick="closeModal('aiModal')">გაუქმება</button>
+                <button class="btn-save" onclick="processAI()">დამუშავება</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="phoneWarningModal">
+        <div class="modal">
+            <h3 style="color: #e74c3c;">ყურადღება! ნომერი აკლია</h3>
+            <p style="font-size: 14px;">სისტემამ ტექსტში მესაკუთრის ტელეფონის ნომერი ვერ იპოვა.</p>
+            <input type="text" id="manualPhoneInput" placeholder="შეიყვანეთ მესაკუთრის ტელეფონი">
+            <div class="btn-group">
+                <button class="btn-cancel" onclick="saveWithoutPhone()">ცარიელის შენახვა</button>
+                <button class="btn-save" onclick="saveWithManualPhone()">შენახვა ნომრით</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
