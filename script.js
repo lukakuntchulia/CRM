@@ -1,59 +1,44 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// ==========================================
-// 1. გლობალური შეცდომების დამჭერი (დებაგინგისთვის)
-// ==========================================
-window.onerror = function(msg, url, line) {
-    alert("სისტემური შეცდომა: " + msg + "\nხაზი: " + line);
-};
-
-// ==========================================
-// 2. ტელეგრამის ინიციალიზაცია
-// ==========================================
-if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand();
-    
-    // აქ შეგიძლიათ ჩაწეროთ თქვენი ID-ები მომავალში წვდომის შეზღუდვისთვის
-    const currentUser = window.Telegram.WebApp.initDataUnsafe?.user?.id;
-}
-
-// ==========================================
-// 3. მონაცემების მართვა (LocalStorage)
-// ==========================================
+// 1. მონაცემების ინიციალიზაცია
 let properties = JSON.parse(localStorage.getItem('realEstateCRM')) || [];
 let pendingProperty = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-    renderTable();
+// თქვენი მუდმივი (Default) გასაღები
+const DEFAULT_API_KEY = "AIzaSyAkUPpT041PgtFzdSKOMOwxYppAPbZoEsM";
 
-    // 🚀 ვამოწმებთ გასაღებს გვერდის ჩატვირთვისთანავე
-    const apiKey = getStoredApiKey();
-    if (!apiKey) {
-        // თუ გასაღები არ არის, ვაჩვენებთ ფანჯარას
-        const modal = document.getElementById('apiKeyModal');
-        if (modal) modal.style.display = 'flex';
-    }
+// 2. გვერდის ჩატვირთვისას გაშვება
+document.addEventListener("DOMContentLoaded", () => {
+    setupApiKey(); // გასაღების კონფიგურაცია
+    renderTable(); // ცხრილის დახატვა
 });
 
-// API გასაღების ამოღება მეხსიერებიდან
-function getStoredApiKey() {
-    return localStorage.getItem('geminiApiKey');
+// 3. API Key-ს მართვის ლოგიკა
+function setupApiKey() {
+    const storedKey = localStorage.getItem('geminiApiKey');
+    
+    // თუ გასაღები საერთოდ არ არსებობს, ვადგენთ თქვენს მითითებულ გასაღებს
+    if (!storedKey || storedKey.trim() === "") {
+        localStorage.setItem('geminiApiKey', DEFAULT_API_KEY);
+        console.log("სისტემამ გამოიყენა ნაგულისხმევი API გასაღები.");
+    }
 }
 
-// API გასაღების შენახვა (მოდალიდან)
+function getActiveApiKey() {
+    return localStorage.getItem('geminiApiKey') || DEFAULT_API_KEY;
+}
+
 window.global_saveApiKey = function() {
-    const key = document.getElementById('apiKeyInput').value.trim();
-    if (key.length < 20) return alert("გთხოვთ შეიყვანოთ ვალიდური API გასაღები!");
-    localStorage.setItem('geminiApiKey', key);
+    const keyInput = document.getElementById('apiKeyInput').value.trim();
+    if (keyInput.length < 20) return alert("გთხოვთ შეიყვანოთ ვალიდური გასაღები!");
+    
+    localStorage.setItem('geminiApiKey', keyInput);
     document.getElementById('apiKeyModal').style.display = 'none';
-    alert("კონფიგურაცია წარმატებულია!");
-    location.reload(); // გვერდის გადატვირთვა ქეშის გასაწმენდად
+    alert("პარამეტრები განახლდა!");
+    location.reload(); // გვერდის გადატვირთვა ცვლილებების ასასახად
 };
 
-// ==========================================
-// 4. ინტერფეისის ხატვა (Table Rendering)
-// ==========================================
+// 4. ცხრილის დახატვა (Rendering)
 function renderTable(data = properties) {
     const tbody = document.getElementById('tableBody');
     if (!tbody) return;
@@ -62,28 +47,28 @@ function renderTable(data = properties) {
     data.forEach(prop => {
         const tr = document.createElement('tr');
         
-        // სტატუსის მიხედვით ფერების მინიჭება
-        let rowBgColor = 'transparent';
-        if (prop.status === 'აქტიური') rowBgColor = 'rgba(76, 175, 80, 0.1)';
-        if (prop.status === 'ჩანიშნულია') rowBgColor = 'rgba(255, 193, 7, 0.1)';
-        if (prop.status === 'გაქირავდა ჩვენით') rowBgColor = 'rgba(33, 150, 243, 0.1)';
-        if (prop.status === 'გაქირავდა სხვით') rowBgColor = 'rgba(244, 67, 54, 0.1)';
+        // სტატუსის ვიზუალური ფერები
+        let bgColor = 'transparent';
+        if (prop.status === 'აქტიური') bgColor = 'var(--status-active)';
+        if (prop.status === 'ჩანიშნულია') bgColor = 'var(--status-meeting)';
+        if (prop.status === 'გაქირავდა ჩვენით') bgColor = 'var(--status-success)';
+        if (prop.status === 'გაქირავდა სხვით') bgColor = 'var(--status-failed)';
         
-        tr.style.backgroundColor = rowBgColor;
+        tr.style.backgroundColor = bgColor;
         tr.innerHTML = `
             <td data-label="მესაკუთრე">${prop.owner_name || 'N/A'}</td>
-            <td data-label="მესაკუთრის ტელ">${prop.phone || 'N/A'}</td>
-            <td data-label="Link">${prop.link ? `<a href="${prop.link}" target="_blank">ბმული</a>` : 'N/A'}</td>
+            <td data-label="ტელეფონი">${prop.phone || 'N/A'}</td>
+            <td data-label="ბმული">${prop.link ? `<a href="${prop.link}" target="_blank">ბმული</a>` : 'N/A'}</td>
             <td data-label="გარიგება">${prop.deal_type || 'N/A'}</td>
             <td data-label="ტიპი">${prop.prop_type || 'N/A'}</td>
-            <td data-label="ლოკაცია & ფასი">${prop.location || 'N/A'} - ${prop.price || ''}</td>
-            <td data-label="სოც. ქსელი">${prop.social_permit || 'N/A'}</td>
+            <td data-label="ლოკაცია">${prop.location || 'N/A'} - ${prop.price || ''}</td>
+            <td data-label="სოც. ნებართვა">${prop.social_permit || 'N/A'}</td>
             <td data-label="პირობები">${prop.conditions || 'N/A'}</td>
             <td data-label="კომენტარი">${prop.comment || 'N/A'}</td>
             <td data-label="Agency ID">${prop.agency_id || 'N/A'}</td>
-            <td data-label="კლიენტის სახ" contenteditable="true" onblur="global_updateInlineField(${prop.internal_id}, 'client_name', this.innerText)">${prop.client_name || ''}</td>
-            <td data-label="კლიენტის ტელ" contenteditable="true" onblur="global_updateInlineField(${prop.internal_id}, 'client_phone', this.innerText)">${prop.client_phone || ''}</td>
-            <td data-label="შედეგი">
+            <td data-label="კლიენტი" contenteditable="true" onblur="global_updateField(${prop.internal_id}, 'client_name', this.innerText)">${prop.client_name || ''}</td>
+            <td data-label="კლიენტის ტელ" contenteditable="true" onblur="global_updateField(${prop.internal_id}, 'client_phone', this.innerText)">${prop.client_phone || ''}</td>
+            <td data-label="სტატუსი">
                 <select class="status-dropdown" onchange="global_updateStatus(${prop.internal_id}, this.value)">
                     <option value="აქტიური" ${prop.status === 'აქტიური' ? 'selected' : ''}>აქტიური</option>
                     <option value="ჩანიშნულია" ${prop.status === 'ჩანიშნულია' ? 'selected' : ''}>ჩანიშნულია</option>
@@ -96,96 +81,70 @@ function renderTable(data = properties) {
     });
 }
 
-// ==========================================
-// 5. ძებნა და ფილტრაცია
-// ==========================================
+// 5. ძებნის ლოგიკა
 window.global_filterTable = function() {
-    const rawQuery = document.getElementById('searchInput').value.toLowerCase();
-    const query = rawQuery.replace(/\s+/g, ''); 
-    const filtered = properties.filter(prop => {
-        const matchID = prop.agency_id ? String(prop.agency_id).toLowerCase().includes(query) : false;
-        const matchPhone = prop.phone ? String(prop.phone).replace(/[-\s]/g, '').includes(query) : false;
-        const matchPrice = prop.price ? String(prop.price).replace(/\s+/g, '').toLowerCase().includes(query) : false;
-        return matchID || matchPhone || matchPrice;
-    });
+    const q = document.getElementById('searchInput').value.toLowerCase().replace(/\s+/g, '');
+    const filtered = properties.filter(p => 
+        (p.agency_id && String(p.agency_id).toLowerCase().includes(q)) || 
+        (p.phone && String(p.phone).replace(/\D/g,'').includes(q)) ||
+        (p.owner_name && p.owner_name.toLowerCase().includes(q))
+    );
     renderTable(filtered);
 };
 
-// ==========================================
-// 6. AI ლოგიკა (Gemini API)
-// ==========================================
-window.global_openAIModal = function() { 
-    document.getElementById('aiModal').style.display = 'flex'; 
-};
-
-window.global_closeModal = function(id) { 
-    document.getElementById(id).style.display = 'none'; 
-};
+// 6. AI დამუშავება (Gemini SDK)
+window.global_openAIModal = function() { document.getElementById('aiModal').style.display='flex'; };
+window.global_closeModal = function(id) { document.getElementById(id).style.display='none'; };
 
 window.global_processAI = async function() {
     const rawText = document.getElementById('aiInput').value;
-    if (!rawText) return alert("გთხოვთ შეიყვანოთ ტექსტი");
+    if (!rawText.trim()) return alert("შეიყვანეთ ტექსტი!");
 
-    const apiKey = getStoredApiKey();
-    if (!apiKey) {
-        document.getElementById('aiModal').style.display = 'none';
-        document.getElementById('apiKeyModal').style.display = 'flex';
-        return;
-    }
-
-    const saveBtn = document.querySelector('.btn-save');
-    saveBtn.innerText = "მუშავდება...";
-    saveBtn.disabled = true;
+    const apiKey = getActiveApiKey();
+    const btn = document.querySelector('#aiModal .btn-save');
+    btn.innerText = "მუშავდება...";
+    btn.disabled = true;
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        // ვიყენებთ სტაბილურ მოდელს ინსტრუქციების გარეშე (404-ის პრევენცია)
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const prompt = `შენ ხარ უძრავი ქონების ასისტენტი. ამოიღე მონაცემები ტექსტიდან და დააბრუნე მკაცრი JSON ობიექტი.
-        ფორმატი: { 
-            "owner_name": "", "phone": "", "link": "", "deal_type": "", "prop_type": "", 
-            "location": "", "price": "", "social_permit": "", "conditions": "", 
-            "comment": "", "agency_id": "" 
-        }
-        წესები: არ გამოიყენო Markdown (\`\`\`json). მხოლოდ JSON ტექსტი.
+        const prompt = `ამოიღე მონაცემები ტექსტიდან და დააბრუნე მკაცრი JSON: 
+        { "owner_name": "", "phone": "", "link": "", "deal_type": "", "prop_type": "", "location": "", "price": "", "social_permit": "", "conditions": "", "comment": "", "agency_id": "" }
         ტექსტი დასამუშავებლად: "${rawText}"`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        let responseText = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
+        const text = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
         
-        let extractedData = JSON.parse(responseText);
+        const data = JSON.parse(text);
 
-        // დამატებითი ველების ინიციალიზაცია
-        extractedData.internal_id = Date.now();
-        extractedData.status = "აქტიური";
-        extractedData.client_name = ""; 
-        extractedData.client_phone = "";
+        // დამატებითი ატრიბუტები
+        data.internal_id = Date.now();
+        data.status = "აქტიური";
+        data.client_name = ""; 
+        data.client_phone = "";
 
         global_closeModal('aiModal');
         document.getElementById('aiInput').value = '';
 
-        // ნომრის შემოწმება
-        if (!extractedData.phone || extractedData.phone === "N/A" || extractedData.phone === "") {
-            pendingProperty = extractedData;
+        // თუ ნომერი არ არის, გადავდივართ მექანიკურ რეჟიმში
+        if (!data.phone || data.phone === "N/A" || data.phone === "") {
+            pendingProperty = data;
             document.getElementById('phoneWarningModal').style.display = 'flex';
         } else {
-            saveToDB(extractedData);
+            saveToDB(data);
         }
-
-    } catch (error) {
-        console.error("AI Error:", error);
-        alert("შეცდომა დამუშავებისას: " + error.message);
+    } catch (e) {
+        console.error("AI Error:", e);
+        alert("შეცდომა: " + e.message);
     } finally {
-        saveBtn.innerText = "დამუშავება";
-        saveBtn.disabled = false;
+        btn.innerText = "დამუშავება";
+        btn.disabled = false;
     }
 };
 
-// ==========================================
-// 7. მონაცემთა ბაზის ფუნქციები
-// ==========================================
+// 7. შენახვის ფუნქციები
 function saveToDB(data) {
     properties.unshift(data);
     localStorage.setItem('realEstateCRM', JSON.stringify(properties));
@@ -193,11 +152,12 @@ function saveToDB(data) {
 }
 
 window.global_saveWithManualPhone = function() {
-    const num = document.getElementById('manualPhoneInput').value;
-    if(!num) return alert("ჩაწერეთ ნომერი!");
-    pendingProperty.phone = num;
+    const manualNum = document.getElementById('manualPhoneInput').value;
+    if (!manualNum) return alert("მიუთითეთ ნომერი!");
+    pendingProperty.phone = manualNum;
     saveToDB(pendingProperty);
     global_closeModal('phoneWarningModal');
+    document.getElementById('manualPhoneInput').value = '';
 };
 
 window.global_saveWithoutPhone = function() {
@@ -205,18 +165,18 @@ window.global_saveWithoutPhone = function() {
     global_closeModal('phoneWarningModal');
 };
 
-window.global_updateInlineField = function(id, field, newValue) {
-    const index = properties.findIndex(p => p.internal_id === id);
-    if (index > -1) {
-        properties[index][field] = newValue.trim();
+window.global_updateField = function(id, field, val) {
+    const i = properties.findIndex(p => p.internal_id === id);
+    if (i > -1) {
+        properties[i][field] = val.trim();
         localStorage.setItem('realEstateCRM', JSON.stringify(properties));
     }
 };
 
-window.global_updateStatus = function(id, newStatus) {
-    const index = properties.findIndex(p => p.internal_id === id);
-    if (index > -1) {
-        properties[index].status = newStatus;
+window.global_updateStatus = function(id, status) {
+    const i = properties.findIndex(p => p.internal_id === id);
+    if (i > -1) {
+        properties[i].status = status;
         localStorage.setItem('realEstateCRM', JSON.stringify(properties));
         renderTable();
     }
