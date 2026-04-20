@@ -1,31 +1,25 @@
-// ტელეგრამის ინიციალიზაცია
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// 1. ტელეგრამის ინიციალიზაცია
 if(window.Telegram && window.Telegram.WebApp) {
     window.Telegram.WebApp.ready();
     window.Telegram.WebApp.expand();
-
-    // უსაფრთხოების სისტემა (მხოლოდ დაშვებული ადამიანებისთვის)
-    const currentUser = window.Telegram.WebApp.initDataUnsafe?.user?.id;
     
-    // ⚠️ აქ ჩაწერეთ თქვენი და მეორე რეალტორის ID-ები
-    const allowedUsers = [8051620983, 987654321]; 
-
-    // ვამოწმებთ: თუ აპლიკაცია ტელეგრამიდან გაიხსნა და ID არ ემთხვევა დაშვებულებს
+    // დროებით დავაკომენტაროთ ეს ნაწილი, რომ წვდომის პრობლემა გამოირიცხოს
+    /*
+    const currentUser = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+    const allowedUsers = [123456789, 987654321]; 
     if (currentUser && !allowedUsers.includes(currentUser)) {
-        // ვშლით მთლიან CRM-ს და ვწერთ წითელ გაფრთხილებას
-        document.body.innerHTML = `
-            <div style="display:flex; height:100vh; align-items:center; justify-content:center; text-align:center; padding:20px;">
-                <h2 style="color:#e74c3c;">წვდომა შეზღუდულია! 🛑<br><br>თქვენ არ გაქვთ ამ სისტემის გამოყენების უფლება.</h2>
-            </div>
-        `;
-        throw new Error("Access Denied"); // ვაჩერებთ კოდის შემდგომ მუშაობას
+        alert("თქვენი ID არ არის დაშვებული: " + currentUser);
+        throw new Error("Access Denied");
     }
-}
-// ტელეგრამის ინიციალიზაცია
-if(window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand();
+    */
 }
 
+// დავამატოთ გლობალური შეცდომების დამჭერი, რომ ტელეფონზე ვნახოთ რა ფუჭდება
+window.onerror = function(msg, url, line) {
+    alert("Error: " + msg + "\nLine: " + line);
+};
 // ლოკალური ბაზის წამოღება
 let properties = JSON.parse(localStorage.getItem('realEstateCRM')) || [];
 let pendingProperty = null;
