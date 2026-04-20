@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Real Estate CRM - Premium</title>
+    <title>Real Estate CRM V2</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
+    <link rel="stylesheet" href="style.css?v=5">
+
     <script type="importmap">
     {
         "imports": {
@@ -13,184 +16,13 @@
         }
     }
     </script>
-
-    <style>
-        :root {
-            --tg-theme-bg: #ffffff;
-            --tg-theme-text: #000000;
-            --primary-color: #2481cc;
-            --status-active: rgba(76, 175, 80, 0.1);
-            --status-meeting: rgba(255, 193, 7, 0.1);
-            --status-success: rgba(33, 150, 243, 0.1);
-            --status-failed: rgba(244, 67, 54, 0.1);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 10px;
-            color: var(--tg-theme-text);
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            position: sticky;
-            top: 0;
-            background: #f4f4f9;
-            padding: 10px 0;
-            z-index: 10;
-        }
-
-        #searchInput {
-            flex-grow: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            outline: none;
-            font-size: 16px;
-        }
-
-        .btn-add {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ცხრილის სტილები */
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            overflow-x: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        th, td {
-            padding: 12px 10px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background-color: #fafafa;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            font-size: 11px;
-        }
-
-        /* მოდალური ფანჯრების სტილები */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(3px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            box-sizing: border-box;
-        }
-
-        .modal h3 {
-            margin-top: 0;
-            color: #333;
-        }
-
-        textarea, input[type="password"], input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-save {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            flex: 1;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            background: #eee;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            flex: 1;
-            cursor: pointer;
-        }
-
-        .status-dropdown {
-            padding: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 12px;
-        }
-
-        /* მობილური ადაპტაცია */
-        @media (max-width: 600px) {
-            th { display: none; }
-            td {
-                display: block;
-                text-align: right;
-                padding-left: 50%;
-                position: relative;
-            }
-            td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 10px;
-                font-weight: bold;
-                text-align: left;
-                color: #888;
-            }
-        }
-    </style>
 </head>
 <body>
 
     <div class="header-controls">
         <input type="text" id="searchInput" placeholder="ძებნა (ID, ნომერი, ფასი)..." oninput="global_filterTable()">
         <button class="btn-add" onclick="global_openAIModal()">+</button>
+        <button class="btn-settings" onclick="document.getElementById('apiKeyModal').style.display='flex'">⚙️</button>
     </div>
 
     <div class="table-container">
@@ -219,18 +51,20 @@
 
     <div id="apiKeyModal" class="modal-overlay">
         <div class="modal">
-            <h3>⚙️ კონფიგურაცია</h3>
-            <p>სისტემის გასააქტიურებლად შეიყვანეთ თქვენი Gemini API Key:</p>
+            <h3>⚙️ სისტემის აქტივაცია</h3>
+            <p>შეიყვანეთ Gemini API Key სისტემის ასამუშავებლად:</p>
             <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
-            <button class="btn-save" onclick="global_saveApiKey()">შენახვა და გააქტიურება</button>
+            <div class="btn-group">
+                <button class="btn-save" onclick="global_saveApiKey()">შენახვა</button>
+            </div>
         </div>
     </div>
 
     <div id="aiModal" class="modal-overlay">
         <div class="modal">
-            <h3>🤖 AI დამატება</h3>
-            <p>ჩასვით განცხადების ტექსტი:</p>
-            <textarea id="aiInput" rows="6" placeholder="მაგ: მარიამი 599123456, იყიდება 3 ოთახიანი..."></textarea>
+            <h3>🤖 განცხადების დამატება</h3>
+            <p>ჩასვით ტექსტი დასამუშავებლად:</p>
+            <textarea id="aiInput" rows="6" placeholder="მაგ: მარიამი 599123456, იყიდება..."></textarea>
             <div class="btn-group">
                 <button class="btn-cancel" onclick="global_closeModal('aiModal')">გაუქმება</button>
                 <button class="btn-save" onclick="global_processAI()">დამუშავება</button>
@@ -241,8 +75,8 @@
     <div id="phoneWarningModal" class="modal-overlay">
         <div class="modal">
             <h3>⚠️ ნომერი ვერ მოიძებნა</h3>
-            <p>AI-მ ვერ ამოიცნო მესაკუთრის ნომერი. გსურთ ხელით შეიყვანოთ?</p>
-            <input type="text" id="manualPhoneInput" placeholder="599 XXX XXX">
+            <p>გთხოვთ მიუთითოთ მესაკუთრის ნომერი ხელით:</p>
+            <input type="text" id="manualPhoneInput" placeholder="599XXXXXX">
             <div class="btn-group">
                 <button class="btn-cancel" onclick="global_saveWithoutPhone()">ნომრის გარეშე</button>
                 <button class="btn-save" onclick="global_saveWithManualPhone()">შენახვა</button>
@@ -250,7 +84,7 @@
         </div>
     </div>
 
-    <script type="module" src="script.js?v=4"></script>
+    <script type="module" src="script.js?v=5"></script>
 
 </body>
 </html>
