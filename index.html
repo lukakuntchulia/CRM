@@ -3,88 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Real Estate CRM V2</title>
-    
+    <title>Real Estate CRM - Premium</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <link rel="stylesheet" href="style.css?v=5">
-
-    <script type="importmap">
-    {
-        "imports": {
-            "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-    }
-    </script>
 </head>
-<body>
+<body class="dark-mode">
 
-    <div class="header-controls">
-        <input type="text" id="searchInput" placeholder="ძებნა (ID, ნომერი, ფასი)..." oninput="global_filterTable()">
-        <button class="btn-add" onclick="global_openAIModal()">+</button>
-        <button class="btn-settings" onclick="document.getElementById('apiKeyModal').style.display='flex'">⚙️</button>
-    </div>
+    <div class="app-wrapper">
+        <header class="search-header">
+            <input type="text" id="searchInput" placeholder="ძებნა (ID, ტელეფონი, სიტყვა)..." oninput="global_filterTable()">
+        </header>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>მესაკუთრე</th>
-                    <th>ტელეფონი</th>
-                    <th>ბმული</th>
-                    <th>გარიგება</th>
-                    <th>ტიპი</th>
-                    <th>ლოკაცია & ფასი</th>
-                    <th>სოც. ნებართვა</th>
-                    <th>პირობები</th>
-                    <th>კომენტარი</th>
-                    <th>Agency ID</th>
-                    <th>კლიენტის სახელი</th>
-                    <th>კლიენტის ტელ</th>
-                    <th>შედეგი</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                </tbody>
-        </table>
-    </div>
+        <main class="content-area">
+            <div class="table-responsive">
+                <table id="crmTable">
+                    <thead>
+                        <tr>
+                            <th>მესაკუთრე</th>
+                            <th>ტელეფონი</th>
+                            <th>Link</th>
+                            <th>გარიგება</th>
+                            <th>ტიპი</th>
+                            <th>ლოკაცია & ფასი</th>
+                            <th>სოც. ნებართვა</th>
+                            <th>პირობები</th>
+                            <th>კომენტარი</th>
+                            <th>Agency ID</th>
+                            <th>კლიენტის სახელი</th>
+                            <th>კლიენტის ტელ</th>
+                            <th>შედეგი</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
+            </div>
+        </main>
 
-    <div id="apiKeyModal" class="modal-overlay">
-        <div class="modal">
-            <h3>⚙️ სისტემის აქტივაცია</h3>
-            <p>შეიყვანეთ Gemini API Key სისტემის ასამუშავებლად:</p>
-            <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
-            <div class="btn-group">
-                <button class="btn-save" onclick="global_saveApiKey()">შენახვა</button>
+        <button class="fab-add" onclick="global_openModal()">+</button>
+
+        <div id="aiModal" class="modal-overlay">
+            <div class="modal">
+                <h3>ახალი განცხადება</h3>
+                <textarea id="aiInput" placeholder="ჩაწერეთ ტექსტი... (მაგ: ქირავდება ბინა აბაშიძეზე...)"></textarea>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="global_closeModal()">გაუქმება</button>
+                    <button class="btn-save" onclick="global_processManualEntry()">დამატება</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="aiModal" class="modal-overlay">
-        <div class="modal">
-            <h3>🤖 განცხადების დამატება</h3>
-            <p>ჩასვით ტექსტი დასამუშავებლად:</p>
-            <textarea id="aiInput" rows="6" placeholder="მაგ: მარიამი 599123456, იყიდება..."></textarea>
-            <div class="btn-group">
-                <button class="btn-cancel" onclick="global_closeModal('aiModal')">გაუქმება</button>
-                <button class="btn-save" onclick="global_processAI()">დამუშავება</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="phoneWarningModal" class="modal-overlay">
-        <div class="modal">
-            <h3>⚠️ ნომერი ვერ მოიძებნა</h3>
-            <p>გთხოვთ მიუთითოთ მესაკუთრის ნომერი ხელით:</p>
-            <input type="text" id="manualPhoneInput" placeholder="599XXXXXX">
-            <div class="btn-group">
-                <button class="btn-cancel" onclick="global_saveWithoutPhone()">ნომრის გარეშე</button>
-                <button class="btn-save" onclick="global_saveWithManualPhone()">შენახვა</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module" src="script.js?v=5"></script>
-
+    <script src="script.js"></script>
 </body>
 </html>
