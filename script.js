@@ -121,17 +121,23 @@ window.global_processAI = async function() {
         if (success) break;
 
         try {
-            console.log(`ვცდი მოდელს: ${modelName}`);
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: modelName });
+        const genAI = new GoogleGenerativeAI(apiKey);
+        
+        // კრიტიკული ცვლილება: ვაიძულებთ SDK-ს გამოიყენოს 'v1' (სტაბილური) ვერსია 'v1beta'-ს ნაცვლად
+        const model = genAI.getGenerativeModel(
+            { model: "gemini-1.5-flash" }, 
+            { apiVersion: "v1" } 
+        );
 
-            const prompt = `შენ ხარ უძრავი ქონების ასისტენტი. ამოიღე მონაცემები ტექსტიდან და დააბრუნე მხოლოდ სუფთა JSON ობიექტი.
-            ფორმატი: { "owner_name": "", "phone": "", "link": "", "deal_type": "", "prop_type": "", "location": "", "price": "", "social_permit": "", "conditions": "", "comment": "", "agency_id": "" }
-            წესი: არ გამოიყენო Markdown (\`\`\`json). მხოლოდ JSON ტექსტი.
-            ტექსტი დასამუშავებლად: "${rawText}"`;
+        const prompt = `ამოიღე მონაცემები ტექსტიდან და დააბრუნე მხოლოდ სუფთა JSON: 
+        { "owner_name": "", "phone": "", "link": "", "deal_type": "", "prop_type": "", "location": "", "price": "", "social_permit": "", "conditions": "", "comment": "", "agency_id": "" }
+        ტექსტი: "${rawText}"`;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        
+        // ტექსტის გასუფთავება Markdown-ისგან
+        let responseText = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
             
             // გასუფთავება იმ შემთხვევაში, თუ AI მაინც ჩაწერს Markdown-ს
             let text = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
