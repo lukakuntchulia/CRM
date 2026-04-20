@@ -1,134 +1,140 @@
 :root {
-    --tg-theme-bg: #ffffff;
-    --tg-theme-text: #222222;
-    --primary-color: #2481cc;
-    --accent-color: #f0f0f5;
-    --status-active: rgba(76, 175, 80, 0.15);
-    --status-meeting: rgba(255, 193, 7, 0.15);
-    --status-success: rgba(33, 150, 243, 0.15);
-    --status-failed: rgba(244, 67, 54, 0.15);
+    --bg-color: #0d1117;
+    --card-bg: #161b22;
+    --text-main: #c9d1d9;
+    --accent: #58a6ff;
+    --border: #30363d;
+    
+    /* სტატუსის ფერები */
+    --status-active: rgba(88, 166, 255, 0.15); /* მქრთალი ცისფერი */
+    --status-meeting: rgba(46, 160, 67, 0.2);  /* მქრთალი მწვანე */
+    --status-success: #2ea043;                /* მწვანე */
+    --status-failed: #da3633;                 /* წითელი */
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--accent-color);
     margin: 0;
-    padding: 10px;
-    color: var(--tg-theme-text);
+    font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
 }
 
-/* ზედა მენიუ */
-.header-controls {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+.search-header {
+    padding: 15px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--accent-color);
-    padding: 5px 0;
 }
 
 #searchInput {
-    flex-grow: 1;
+    width: 100%;
     padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: white;
     font-size: 16px;
     outline: none;
 }
 
-.btn-add, .btn-settings {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0 15px;
-    border-radius: 12px;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.btn-settings { background-color: #666; }
-
-/* ცხრილის კონტეინერი */
-.table-container {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    overflow: hidden;
+.table-responsive {
+    padding: 10px;
+    overflow-x: auto;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 1200px;
 }
 
 th, td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border: 1px solid var(--border);
+    font-size: 14px;
 }
 
-th {
-    background: #fdfdfd;
-    font-size: 11px;
-    color: #888;
-    text-transform: uppercase;
+th { background: var(--card-bg); color: var(--accent); font-weight: 600; }
+
+/* სტატუსის დინამიური კლასები */
+.status-active { background-color: var(--status-active); }
+.status-meeting { background-color: var(--status-meeting); }
+.status-success { background-color: var(--status-success); color: white; }
+.status-failed { background-color: var(--status-failed); color: white; }
+
+.fab-add {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    cursor: pointer;
 }
 
-/* მოდალები */
 .modal-overlay {
     display: none;
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.8);
     z-index: 200;
     justify-content: center;
     align-items: center;
 }
 
 .modal {
-    background: white;
+    background: var(--card-bg);
+    width: 90%;
+    max-width: 500px;
     padding: 20px;
-    border-radius: 20px;
-    width: 85%;
-    max-width: 380px;
+    border-radius: 12px;
 }
 
-textarea, input[type="text"], input[type="password"] {
+textarea {
     width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    margin: 10px 0;
-    box-sizing: border-box;
+    height: 120px;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 15px 0;
+    font-family: inherit;
 }
 
-.btn-group { display: flex; gap: 8px; }
-.btn-save { background: var(--primary-color); color: white; border: none; padding: 12px; border-radius: 10px; flex: 1; font-weight: bold; }
-.btn-cancel { background: #eee; border: none; padding: 12px; border-radius: 10px; flex: 1; }
+.modal-actions { display: flex; gap: 10px; }
+.btn-save { background: var(--accent); color: white; flex: 1; padding: 10px; border-radius: 5px; border: none; cursor: pointer; }
+.btn-cancel { background: #30363d; color: white; flex: 1; padding: 10px; border-radius: 5px; border: none; cursor: pointer; }
 
 /* მობილური ხედი - ცხრილის ბარათებად გადაქცევა */
-@media (max-width: 600px) {
-    thead { display: none; }
-    tr {
-        display: block;
-        margin-bottom: 15px;
-        border-bottom: 2px solid #ddd;
-    }
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr { display: block; }
+    thead tr { display: none; }
+    tr { margin-bottom: 15px; background: var(--card-bg); border-radius: 10px; padding: 10px; border: 1px solid var(--border); }
     td {
-        display: block;
-        text-align: right;
-        padding-left: 45%;
+        border: none;
         position: relative;
+        padding-left: 45%;
+        text-align: right;
+        margin-bottom: 10px;
         min-height: 20px;
     }
     td::before {
         content: attr(data-label);
         position: absolute;
-        left: 12px;
+        left: 10px;
+        width: 40%;
+        text-align: left;
         font-weight: bold;
-        color: #777;
+        color: var(--accent);
     }
 }
