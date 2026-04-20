@@ -1,140 +1,64 @@
 :root {
-    --bg-color: #0d1117;
-    --card-bg: #161b22;
-    --text-main: #c9d1d9;
+    --bg: #0d1117;
+    --card: #161b22;
+    --text: #c9d1d9;
     --accent: #58a6ff;
     --border: #30363d;
-    
-    /* სტატუსის ფერები */
-    --status-active: rgba(88, 166, 255, 0.15); /* მქრთალი ცისფერი */
-    --status-meeting: rgba(46, 160, 67, 0.2);  /* მქრთალი მწვანე */
-    --status-success: #2ea043;                /* მწვანე */
-    --status-failed: #da3633;                 /* წითელი */
+    --success: #2ea043;
+    --danger: #da3633;
 }
 
 body {
-    margin: 0;
-    font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    -webkit-font-smoothing: antialiased;
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, system-ui, sans-serif;
 }
 
 .search-header {
-    padding: 15px;
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    display: flex; gap: 10px; padding: 15px;
+    background: var(--card); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
 }
 
 #searchInput {
-    width: 100%;
-    padding: 12px;
-    background: var(--bg-color);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-    outline: none;
+    flex: 1; padding: 12px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 8px; color: white;
 }
 
-.table-responsive {
-    padding: 10px;
-    overflow-x: auto;
-}
+.settings-btn { background: none; border: none; font-size: 24px; cursor: pointer; }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1200px;
-}
+.table-responsive { padding: 10px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+th, td { padding: 12px; border: 1px solid var(--border); text-align: left; font-size: 13px; }
 
-th, td {
-    padding: 12px;
-    text-align: left;
-    border: 1px solid var(--border);
-    font-size: 14px;
-}
-
-th { background: var(--card-bg); color: var(--accent); font-weight: 600; }
-
-/* სტატუსის დინამიური კლასები */
-.status-active { background-color: var(--status-active); }
-.status-meeting { background-color: var(--status-meeting); }
-.status-success { background-color: var(--status-success); color: white; }
-.status-failed { background-color: var(--status-failed); color: white; }
+.status-meeting { background: rgba(46, 160, 67, 0.2); }
+.status-success { background: var(--success); color: white; }
+.status-failed { background: var(--danger); color: white; }
+.status-default { background: rgba(88, 166, 255, 0.1); }
 
 .fab-add {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    width: 60px;
-    height: 60px;
-    background: var(--accent);
-    border-radius: 50%;
-    border: none;
-    color: white;
-    font-size: 30px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    cursor: pointer;
+    position: fixed; bottom: 25px; right: 25px;
+    width: 60px; height: 60px; background: var(--accent);
+    border-radius: 50%; border: none; color: white; font-size: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer;
 }
 
 .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 200;
-    justify-content: center;
-    align-items: center;
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+    z-index: 200; justify-content: center; align-items: center;
 }
 
-.modal {
-    background: var(--card-bg);
-    width: 90%;
-    max-width: 500px;
-    padding: 20px;
-    border-radius: 12px;
-}
-
-textarea {
-    width: 100%;
-    height: 120px;
-    background: var(--bg-color);
-    border: 1px solid var(--border);
-    color: white;
-    border-radius: 8px;
-    padding: 10px;
-    margin: 15px 0;
-    font-family: inherit;
-}
+.modal { background: var(--card); width: 90%; max-width: 450px; padding: 20px; border-radius: 12px; }
+textarea { width: 100%; height: 120px; background: var(--bg); color: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: white; box-sizing: border-box; }
 
 .modal-actions { display: flex; gap: 10px; }
-.btn-save { background: var(--accent); color: white; flex: 1; padding: 10px; border-radius: 5px; border: none; cursor: pointer; }
-.btn-cancel { background: #30363d; color: white; flex: 1; padding: 10px; border-radius: 5px; border: none; cursor: pointer; }
+.btn-save { background: var(--accent); color: white; flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+.btn-cancel { background: #30363d; color: white; flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; }
 
-/* მობილური ხედი - ცხრილის ბარათებად გადაქცევა */
 @media (max-width: 768px) {
-    table, thead, tbody, th, td, tr { display: block; }
-    thead tr { display: none; }
-    tr { margin-bottom: 15px; background: var(--card-bg); border-radius: 10px; padding: 10px; border: 1px solid var(--border); }
-    td {
-        border: none;
-        position: relative;
-        padding-left: 45%;
-        text-align: right;
-        margin-bottom: 10px;
-        min-height: 20px;
-    }
-    td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        width: 40%;
-        text-align: left;
-        font-weight: bold;
-        color: var(--accent);
-    }
+    thead { display: none; }
+    tr { display: block; margin-bottom: 15px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+    td { display: block; text-align: right; padding-left: 50%; position: relative; border: none; margin-bottom: 8px; }
+    td::before { content: attr(data-label); position: absolute; left: 10px; font-weight: bold; color: var(--accent); }
 }
