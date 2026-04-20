@@ -92,56 +92,81 @@ window.global_filterTable = function() {
     renderTable(filtered);
 };
 
-// 6. AI დამუშავება (Gemini SDK)
-window.global_openAIModal = function() { document.getElementById('aiModal').style.display='flex'; };
-window.global_closeModal = function(id) { document.getElementById(id).style.display='none'; };
+// ==========================================
+// 6. AI დამუშავება (Gemini API - Smart Fallback)
+// ==========================================
+window.global_openAIModal = function() { 
+    document.getElementById('aiModal').style.display = 'flex'; 
+};
+
+window.global_closeModal = function(id) { 
+    document.getElementById(id).style.display = 'none'; 
+};
 
 window.global_processAI = async function() {
     const rawText = document.getElementById('aiInput').value;
-    if (!rawText.trim()) return alert("შეიყვანეთ ტექსტი!");
+    if (!rawText.trim()) return alert("გთხოვთ შეიყვანოთ ტექსტი!");
 
     const apiKey = getActiveApiKey();
     const btn = document.querySelector('#aiModal .btn-save');
-    btn.innerText = "მუშავდება...";
+    
+    btn.innerText = "კავშირი მყარდება...";
     btn.disabled = true;
 
-    try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // მოდელების სია, რომლებსაც სათითაოდ ვცდით (თუ პირველი 404-ს ამოაგდებს)
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
+    let success = false;
 
-        const prompt = `ამოიღე მონაცემები ტექსტიდან და დააბრუნე მკაცრი JSON: 
-        { "owner_name": "", "phone": "", "link": "", "deal_type": "", "prop_type": "", "location": "", "price": "", "social_permit": "", "conditions": "", "comment": "", "agency_id": "" }
-        ტექსტი დასამუშავებლად: "${rawText}"`;
+    for (let modelName of modelsToTry) {
+        if (success) break;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
-        
-        const data = JSON.parse(text);
+        try {
+            console.log(`ვცდი მოდელს: ${modelName}`);
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: modelName });
 
-        // დამატებითი ატრიბუტები
-        data.internal_id = Date.now();
-        data.status = "აქტიური";
-        data.client_name = ""; 
-        data.client_phone = "";
+            const prompt = `შენ ხარ უძრავი ქონების ასისტენტი. ამოიღე მონაცემები ტექსტიდან და დააბრუნე მხოლოდ სუფთა JSON ობიექტი.
+            ფორმატი: { "owner_name": "", "phone": "", "link": "", "deal_type": "", "prop_type": "", "location": "", "price": "", "social_permit": "", "conditions": "", "comment": "", "agency_id": "" }
+            წესი: არ გამოიყენო Markdown (\`\`\`json). მხოლოდ JSON ტექსტი.
+            ტექსტი დასამუშავებლად: "${rawText}"`;
 
-        global_closeModal('aiModal');
-        document.getElementById('aiInput').value = '';
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            
+            // გასუფთავება იმ შემთხვევაში, თუ AI მაინც ჩაწერს Markdown-ს
+            let text = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
+            const data = JSON.parse(text);
+            
+            // თუ აქამდე მოაღწია, ნიშნავს რომ მოდელმა იმუშავა
+            data.internal_id = Date.now();
+            data.status = "აქტიური";
+            data.client_name = ""; 
+            data.client_phone = "";
 
-        // თუ ნომერი არ არის, გადავდივართ მექანიკურ რეჟიმში
-        if (!data.phone || data.phone === "N/A" || data.phone === "") {
-            pendingProperty = data;
-            document.getElementById('phoneWarningModal').style.display = 'flex';
-        } else {
-            saveToDB(data);
+            global_closeModal('aiModal');
+            document.getElementById('aiInput').value = '';
+
+            if (!data.phone || data.phone === "N/A" || data.phone === "") {
+                pendingProperty = data;
+                document.getElementById('phoneWarningModal').style.display = 'flex';
+            } else {
+                saveToDB(data);
+            }
+            
+            success = true;
+            console.log(`წარმატებით დამუშავდა მოდელით: ${modelName}`);
+
+        } catch (e) {
+            console.warn(`მოდელმა ${modelName} დააბრუნა შეცდომა:`, e.message);
+            // თუ ბოლო მოდელიცაა და მაინც შეცდომაა
+            if (modelName === modelsToTry[modelsToTry.length - 1]) {
+                alert("შეცდომა: AI სერვისი დროებით მიუწვდომელია. შეამოწმეთ API გასაღები.");
+            }
         }
-    } catch (e) {
-        console.error("AI Error:", e);
-        alert("შეცდომა: " + e.message);
-    } finally {
-        btn.innerText = "დამუშავება";
-        btn.disabled = false;
     }
+
+    btn.innerText = "დამუშავება";
+    btn.disabled = false;
 };
 
 // 7. შენახვის ფუნქციები
