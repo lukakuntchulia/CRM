@@ -5,7 +5,7 @@ let properties = JSON.parse(localStorage.getItem('realEstateCRM')) || [];
 let pendingProperty = null;
 
 // თქვენი მუდმივი (Default) გასაღები
-const DEFAULT_API_KEY = "AIzaSyAkUPpT041PgtFzdSKOMOwxYppAPbZoEsM";
+const DEFAULT_API_KEY = "AIzaSyBMMLLz7P3pdbShHPwL043yt1gWK5IZOKc";
 
 // 2. გვერდის ჩატვირთვისას გაშვება
 document.addEventListener("DOMContentLoaded", () => {
