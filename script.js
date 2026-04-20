@@ -26,6 +26,14 @@ let pendingProperty = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     renderTable();
+
+    // 🚀 ვამოწმებთ გასაღებს გვერდის ჩატვირთვისთანავე
+    const apiKey = getStoredApiKey();
+    if (!apiKey) {
+        // თუ გასაღები არ არის, ვაჩვენებთ ფანჯარას
+        const modal = document.getElementById('apiKeyModal');
+        if (modal) modal.style.display = 'flex';
+    }
 });
 
 // API გასაღების ამოღება მეხსიერებიდან
