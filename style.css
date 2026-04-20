@@ -1,175 +1,134 @@
 :root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-main: #e0e0e0;
-    --text-muted: #9e9e9e;
-    --border-color: #333;
-    --primary-accent: #3498db;
-    
-    --status-active: rgba(52, 152, 219, 0.2);
-    --status-meeting: rgba(46, 204, 113, 0.2);
-    --status-success: rgba(39, 174, 96, 0.6);
-    --status-failed: rgba(231, 76, 60, 0.6);
+    --tg-theme-bg: #ffffff;
+    --tg-theme-text: #222222;
+    --primary-color: #2481cc;
+    --accent-color: #f0f0f5;
+    --status-active: rgba(76, 175, 80, 0.15);
+    --status-meeting: rgba(255, 193, 7, 0.15);
+    --status-success: rgba(33, 150, 243, 0.15);
+    --status-failed: rgba(244, 67, 54, 0.15);
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--accent-color);
     margin: 0;
-    padding: 15px;
-    background-color: var(--bg-color);
-    color: var(--text-main);
+    padding: 10px;
+    color: var(--tg-theme-text);
 }
 
-.search-container {
+/* ზედა მენიუ */
+.header-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
     position: sticky;
     top: 0;
-    background: var(--bg-color);
-    padding-bottom: 15px;
     z-index: 100;
+    background: var(--accent-color);
+    padding: 5px 0;
 }
 
 #searchInput {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-main);
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
     font-size: 16px;
-    box-sizing: border-box;
     outline: none;
 }
 
-#searchInput:focus { border-color: var(--primary-accent); }
+.btn-add, .btn-settings {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 12px;
+    font-size: 20px;
+    cursor: pointer;
+}
 
-.table-wrapper {
-    overflow-x: auto;
+.btn-settings { background-color: #666; }
+
+/* ცხრილის კონტეინერი */
+.table-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
 }
 
 th, td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid #eee;
 }
 
 th {
-    background-color: var(--card-bg);
-    color: var(--text-muted);
-    font-weight: 500;
-    font-size: 13px;
+    background: #fdfdfd;
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
 }
 
-td { font-size: 13px; }
-
-td[contenteditable="true"] {
-    border: 1px dashed var(--border-color);
-    cursor: text;
-    min-width: 80px;
-}
-
-td[contenteditable="true"]:focus {
-    background-color: rgba(255,255,255,0.1);
-    outline: none;
-}
-
-select.status-dropdown {
-    background-color: transparent;
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    padding: 5px;
-    border-radius: 4px;
-    outline: none;
-    width: 100%;
-}
-
-.fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background-color: var(--primary-accent);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    cursor: pointer;
-    z-index: 1000;
-    border: none;
-}
-
+/* მოდალები */
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 1001;
-    align-items: center;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 200;
     justify-content: center;
-    padding: 20px;
+    align-items: center;
 }
 
 .modal {
-    background: var(--card-bg);
+    background: white;
     padding: 20px;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 500px;
+    border-radius: 20px;
+    width: 85%;
+    max-width: 380px;
 }
 
-.modal textarea, .modal input {
+textarea, input[type="text"], input[type="password"] {
     width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-color);
-    color: var(--text-main);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    margin: 10px 0;
     box-sizing: border-box;
 }
 
-.btn-group { display: flex; gap: 10px; margin-top: 15px; }
-.btn-save { background: var(--primary-accent); color: white; border: none; border-radius: 8px; padding: 12px; cursor: pointer; }
-.btn-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; cursor: pointer; }
+.btn-group { display: flex; gap: 8px; }
+.btn-save { background: var(--primary-color); color: white; border: none; padding: 12px; border-radius: 10px; flex: 1; font-weight: bold; }
+.btn-cancel { background: #eee; border: none; padding: 12px; border-radius: 10px; flex: 1; }
 
-/* მობილურის Card View */
-@media screen and (max-width: 768px) {
-    table, thead, tbody, th, td, tr { display: block; }
-    thead tr { position: absolute; top: -9999px; left: -9999px; }
-    
+/* მობილური ხედი - ცხრილის ბარათებად გადაქცევა */
+@media (max-width: 600px) {
+    thead { display: none; }
     tr {
-        background: var(--card-bg);
-        border-radius: 10px;
+        display: block;
         margin-bottom: 15px;
-        padding: 10px;
-        border: 1px solid var(--border-color);
+        border-bottom: 2px solid #ddd;
     }
     td {
-        border: none;
-        position: relative;
+        display: block;
+        text-align: right;
         padding-left: 45%;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        min-height: 25px;
+        position: relative;
+        min-height: 20px;
     }
     td::before {
         content: attr(data-label);
         position: absolute;
-        left: 10px;
-        width: 40%;
-        font-weight: 500;
-        color: var(--text-muted);
-        font-size: 11px;
+        left: 12px;
+        font-weight: bold;
+        color: #777;
     }
-    td[contenteditable="true"] { width: 50%; }
 }
