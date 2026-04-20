@@ -93,86 +93,59 @@ window.global_filterTable = function() {
 };
 
 // ==========================================
-// 6. AI დამუშავება (Gemini API - Smart Fallback)
+// 6. AI დამუშავება (STABLE VERSION 2026)
 // ==========================================
-window.global_openAIModal = function() { 
-    document.getElementById('aiModal').style.display = 'flex'; 
-};
-
-window.global_closeModal = function(id) { 
-    document.getElementById(id).style.display = 'none'; 
-};
+window.global_openAIModal = function() { document.getElementById('aiModal').style.display='flex'; };
+window.global_closeModal = function(id) { document.getElementById(id).style.display='none'; };
 
 window.global_processAI = async function() {
     const rawText = document.getElementById('aiInput').value;
-    if (!rawText.trim()) return alert("გთხოვთ შეიყვანოთ ტექსტი!");
+    if (!rawText.trim()) return alert("შეიყვანეთ ტექსტი!");
 
     const apiKey = getActiveApiKey();
     const btn = document.querySelector('#aiModal .btn-save');
-    
-    btn.innerText = "კავშირი მყარდება...";
+    btn.innerText = "კავშირი...";
     btn.disabled = true;
 
-    // მოდელების სია, რომლებსაც სათითაოდ ვცდით (თუ პირველი 404-ს ამოაგდებს)
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
-    let success = false;
-
-    for (let modelName of modelsToTry) {
-        if (success) break;
-
-        try {
+    try {
         const genAI = new GoogleGenerativeAI(apiKey);
         
-        // კრიტიკული ცვლილება: ვაიძულებთ SDK-ს გამოიყენოს 'v1' (სტაბილური) ვერსია 'v1beta'-ს ნაცვლად
-        const model = genAI.getGenerativeModel(
-            { model: "gemini-1.5-flash" }, 
-            { apiVersion: "v1" } 
-        );
+        /* კრიტიკული ცვლილება: 
+           თუ gemini-1.5-flash ისევ აგდებს 404-ს, შეცვალეთ ქვედა ხაზი ამით:
+           const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); 
+        */
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const prompt = `ამოიღე მონაცემები ტექსტიდან და დააბრუნე მხოლოდ სუფთა JSON: 
+        const prompt = `შენ ხარ უძრავი ქონების ასისტენტი. ამოიღე მონაცემები და დააბრუნე მხოლოდ JSON: 
         { "owner_name": "", "phone": "", "link": "", "deal_type": "", "prop_type": "", "location": "", "price": "", "social_permit": "", "conditions": "", "comment": "", "agency_id": "" }
         ტექსტი: "${rawText}"`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        
-        // ტექსტის გასუფთავება Markdown-ისგან
         let responseText = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
-            
-            // გასუფთავება იმ შემთხვევაში, თუ AI მაინც ჩაწერს Markdown-ს
-            let text = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
-            const data = JSON.parse(text);
-            
-            // თუ აქამდე მოაღწია, ნიშნავს რომ მოდელმა იმუშავა
-            data.internal_id = Date.now();
-            data.status = "აქტიური";
-            data.client_name = ""; 
-            data.client_phone = "";
+        
+        const data = JSON.parse(responseText);
+        data.internal_id = Date.now();
+        data.status = "აქტიური";
+        data.client_name = ""; data.client_phone = "";
 
-            global_closeModal('aiModal');
-            document.getElementById('aiInput').value = '';
+        global_closeModal('aiModal');
+        document.getElementById('aiInput').value = '';
 
-            if (!data.phone || data.phone === "N/A" || data.phone === "") {
-                pendingProperty = data;
-                document.getElementById('phoneWarningModal').style.display = 'flex';
-            } else {
-                saveToDB(data);
-            }
-            
-            success = true;
-            console.log(`წარმატებით დამუშავდა მოდელით: ${modelName}`);
-
-        } catch (e) {
-            console.warn(`მოდელმა ${modelName} დააბრუნა შეცდომა:`, e.message);
-            // თუ ბოლო მოდელიცაა და მაინც შეცდომაა
-            if (modelName === modelsToTry[modelsToTry.length - 1]) {
-                alert("შეცდომა: AI სერვისი დროებით მიუწვდომელია. შეამოწმეთ API გასაღები.");
-            }
+        if (!data.phone || data.phone === "N/A") {
+            pendingProperty = data;
+            document.getElementById('phoneWarningModal').style.display = 'flex';
+        } else {
+            saveToDB(data);
         }
-    }
 
-    btn.innerText = "დამუშავება";
-    btn.disabled = false;
+    } catch (error) {
+        console.error("დეტალური შეცდომა:", error);
+        alert("შეცდომა: მოდელი მიუწვდომელია. შეამოწმეთ API Key ან შეცვალეთ მოდელის სახელი კოდში (მაგ: gemini-2.0-flash).");
+    } finally {
+        btn.innerText = "დამუშავება";
+        btn.disabled = false;
+    }
 };
 
 // 7. შენახვის ფუნქციები
